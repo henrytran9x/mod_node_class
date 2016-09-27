@@ -1,0 +1,6 @@
+name: Node Class Body
+type: module
+description: Adds classes body specific to node
+package: Custom module - Required
+core: 8.x
+version: 1.0

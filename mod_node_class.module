@@ -1,0 +1,57 @@
+<?php
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mod_node_class_form_node_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id){
+
+    $form['mod_node_class_group'] = array(
+        '#type' => 'details',
+        '#title' => t('Body Class settings'),
+        '#description' => t('Assign CSS classes body.'),
+        '#group' => 'advanced',
+        '#open' => FALSE,
+        '#access' => TRUE,
+        '#attributes' => array('class' => array('mod-node-form')),
+    );
+    $form['mod_node_class']['#group'] = 'mod_node_class_group';
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function mod_node_class_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type)
+{
+    if ($entity_type->id() === 'node') {
+        $fields['mod_node_class'] = BaseFieldDefinition::create('string')
+            ->setLabel(t('CSS class(es)'))
+            ->setDisplayOptions('form', array(
+                'type' => 'string_textfield',
+                'weight' => 35,
+            ))
+            ->setDisplayConfigurable('form', TRUE);
+        $fields['mymodule_text'] = BaseFieldDefinition::create('string')
+            ->setLabel(t('The text'))
+            ->setDescription(t('A text property added by mymodule.'))
+            ->setComputed(TRUE);
+        return $fields;
+    }
+}
+
+
+function mod_node_class_preprocess_html(&$variables){
+    $path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $path);
+    if (isset($path_args[1]) && isset($path_args[2]) && ($path_args[1] == 'node') && (is_numeric($path_args[2]))) {
+        $node = \Drupal\node\Entity\Node::load($path_args[2]);
+        $class_body = $node->get('mod_node_class')->getValue();
+        if(isset($class_body) && !empty($class_body)) {
+            $variables['attributes']['class'][] = $class_body[0]['value'];
+        }
+    }
+}
+
