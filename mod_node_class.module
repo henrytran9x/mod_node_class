@@ -49,7 +49,7 @@ function mod_node_class_preprocess_html(&$variables){
     if (isset($path_args[1]) && isset($path_args[2]) && ($path_args[1] == 'node') && (is_numeric($path_args[2]))) {
         $node = \Drupal\node\Entity\Node::load($path_args[2]);
         $class_body = $node->get('mod_node_class')->getValue();
-        if(isset($class_body) && !empty($class_body)) {
+        if(isset($class_body) && !empty($class_body[0])) {
             $variables['attributes']['class'][] = $class_body[0]['value'];
         }
     }
